@@ -2,9 +2,10 @@ import 'dart:convert';
 
 import 'package:clean_arch/src/modules/post/domain/entities/comment.dart';
 import 'package:clean_arch/src/modules/post/domain/entities/post.dart';
-import 'package:clean_arch/src/modules/post/infra/datasources/comment_datasource.dart';
-import 'package:clean_arch/src/modules/post/infra/datasources/post_datasource.dart';
-import 'package:clean_arch/src/modules/post/infra/datasources/user_datasource.dart';
+import 'package:clean_arch/src/modules/post/external/datasources/comment_datasource.dart';
+import 'package:clean_arch/src/modules/post/external/datasources/post_datasource.dart';
+import 'package:clean_arch/src/modules/post/external/datasources/user_datasource.dart';
+
 import 'package:clean_arch/src/modules/post/infra/repositories/post_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
@@ -21,12 +22,14 @@ void main() {
   final PostDatasource postDatasource = PostDatasourceMock();
   final CommentDatasource commentDatasource = CommentDatasourceMock();
 
-  final repository = PostRepository(userDatasource, postDatasource, commentDatasource);
+  final repository =
+      PostRepository(userDatasource, postDatasource, commentDatasource);
 
   test('get posts', () async {
     when(() => userDatasource.getUsers()).thenAnswer((_) async => usersJson);
     when(() => postDatasource.getPosts()).thenAnswer((_) async => postJson);
-    when(() => commentDatasource.getComments()).thenAnswer((_) async => commentJson);
+    when(() => commentDatasource.getComments())
+        .thenAnswer((_) async => commentJson);
 
     final result = await repository.getPosts();
 
@@ -37,7 +40,8 @@ void main() {
     expect((list).first.totalComments, 3);
   });
   test('get comment', () async {
-    when(() => commentDatasource.getComments()).thenAnswer((_) async => commentJson);
+    when(() => commentDatasource.getComments())
+        .thenAnswer((_) async => commentJson);
 
     final result = await repository.getPostComments('0');
 
@@ -47,8 +51,7 @@ void main() {
   });
 }
 
-final usersJson = jsonDecode(
-    r''' 
+final usersJson = jsonDecode(r''' 
 [
 	{
 		"id": "0",
@@ -67,8 +70,7 @@ final usersJson = jsonDecode(
 ]
 
 ''');
-final commentJson = jsonDecode(
-    r''' 
+final commentJson = jsonDecode(r''' 
 [
 	{
 		"id": "0",
@@ -98,8 +100,7 @@ final commentJson = jsonDecode(
 ]
 
 ''');
-final postJson = jsonDecode(
-    r''' 
+final postJson = jsonDecode(r''' 
 [
 	{
 		"id": "0",
